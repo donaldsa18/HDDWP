@@ -101,6 +101,20 @@ public class MagicSquaresGenerator {
 			}
 			return newSquare;
 		}
+		else if(n % 4 == 0) {
+			
+			for(int i=0;i<n;i++) {
+				for(int j=0;j<n;j++) {
+					if(i == j || (n-i-1) == j) {
+						newSquare.square[i][j] = (i*n)+j+1;
+					}
+					else {
+						newSquare.square[i][j] = (n*n)-((i*n)+j);
+					}
+				}
+			}
+			return newSquare;
+		}
 		else {
 			return null;
 		}
@@ -120,4 +134,5 @@ public class MagicSquaresGenerator {
 		}
 		return seqArr;
 	}
+	
 }
