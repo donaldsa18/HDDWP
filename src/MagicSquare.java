@@ -43,4 +43,22 @@ public class MagicSquare {
 		}
 		return null;
 	}*/
+	
+	public String toPuzzle(int dif){
+        String result = "";
+        double delChance = (double)this.n * (double)dif / 9.0; //or 10 maybe?
+        
+         for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                if(Math.random() * this.n > delChance) {
+                    result += this.square[i][j]+"\t";
+                } else {
+                    result += "\t";
+                }
+            }
+            result += "\n";
+        }
+        
+       return result;
+    }
 }

@@ -13,6 +13,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MagicSquaresGenerator {
 	public static void main(String[] args) {
 		int n = 0;
+		int d = 1;
+		
 		if(args.length == 3 && args[1] == "-s") {
 			n = Integer.parseInt(args[2]);
 		}
@@ -20,6 +22,8 @@ public class MagicSquaresGenerator {
 			Scanner scan = new Scanner(System.in);
 			System.out.println("Enter the size of the magic square: ");
 			n = scan.nextInt();
+			System.out.println("Enter a difficulty (1-5): ");
+			d = scan.nextInt();
 			scan.close();
 		}
 		else {
@@ -28,6 +32,7 @@ public class MagicSquaresGenerator {
 		if(n != 0) {
 			MagicSquare square = generateSquare(n);
 			System.out.println(square);
+			System.out.println(square.toPuzzle(d));
 		}
 	}
 	
