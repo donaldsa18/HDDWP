@@ -21,7 +21,15 @@ public class MagicSquare {
 			}
 		}
 	}
-	
+	public MagicSquare copy() {
+		MagicSquare newSq = new MagicSquare(n);
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				newSq.square[i][j] = square[i][j];
+			}
+		}
+		return newSq;
+	}
 	public String toString() {
 		String rtn = "";
 		for(int i = 0; i < n; i++) {
@@ -32,17 +40,42 @@ public class MagicSquare {
 		}
 		return rtn;
 	}
-	/*public static MagicSquare shuffleSquare(MagicSquare sq) {
-		MagicSquare newSquare = new MagicSquare()
-		if(sq.square != null && sq.square[0] != null && sq.square.length == sq.square[0].length) {
-			for(int i=0;i<square.length;i++) {
-				for(int j=0;j<square[0].length;j++) {
-					
+	public void shuffleSquare() {
+		int[][] newSq = new int[n][n];
+		int rand = (int)(Math.random()*8);
+		for(int i=0;i<n;i++) {
+			for(int j=0;j<n;j++) {
+				switch(rand) {
+					case 0: newSq[i][j] = square[i][j];
+							break;
+					case 1: newSq[i][j] = square[n-i-1][j];
+							break;
+					case 2: newSq[i][j] = square[i][n-j-1];
+							break;
+					case 3: newSq[i][j] = square[n-i-i][n-j-1];
+							break;
+					case 4: newSq[i][j] = square[j][i];
+							break;
+					case 5: newSq[i][j] = square[j][n-i-1];
+							break;
+					case 6: newSq[i][j] = square[n-j-1][i];
+							break;
+					case 7: newSq[i][j] = square[n-j-1][n-i-1];
+							break;
+					default:
+							break;
 				}
 			}
 		}
-		return null;
-	}*/
+		square = newSq;
+	}
+	public void addToSquare(int add) {
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				square[i][j] += add;
+			}
+		}
+	}
 	
 	public String toPuzzle(int dif){
         String result = "";

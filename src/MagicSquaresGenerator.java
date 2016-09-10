@@ -6,9 +6,7 @@
  * @author donaldsa18
  *
  */
-import java.util.Random;
 import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MagicSquaresGenerator {
 	public static void main(String[] args) {
@@ -38,78 +36,20 @@ public class MagicSquaresGenerator {
 	
 	private static MagicSquare generateSquare(int n) {
 		MagicSquare newSquare = new MagicSquare(n);
+		//Odd squares
 		if(n % 2 == 1) {
-			int rand = (int)(Math.random()*3);
-			if(rand == 0) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[i-1][j-1] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
+			for(int i=1;i<=n;i++) {
+				for(int j=1;j<=n;j++) {
+					//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
+					newSquare.square[i-1][j-1] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
 				}
 			}
-			else if(rand == 1) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[i-1][n-j] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
-				}
-			}
-			else if(rand == 2) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[n-i][j-1] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
-				}
-			}
-			else if(rand == 3) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[n-i][n-j] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
-				}
-			}
-			else if(rand == 0) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[j-1][i-1] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
-				}
-			}
-			else if(rand == 1) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[n-j][i-1] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
-				}
-			}
-			else if(rand == 2) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[j-1][n-i] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
-				}
-			}
-			else if(rand == 3) {
-				for(int i=1;i<=n;i++) {
-					for(int j=1;j<=n;j++) {
-						//Algorithm from https://en.wikipedia.org/wiki/Magic_square#Method_for_constructing_a_magic_square_of_odd_order
-						newSquare.square[n-j][n-i] = n*( (i+j-1+(int)(n/2))%n ) + ((i+2*j-2)%n) + 1;
-					}
-				}
-			}
-			return newSquare;
 		}
+		//Doubly even squares
 		else if(n % 4 == 0) {
-			
 			for(int i=0;i<n;i++) {
 				for(int j=0;j<n;j++) {
+					//Algorithm from https://en.wikipedia.org/wiki/Magic_square#A_method_of_constructing_a_magic_square_of_doubly_even_order
 					if(i == j || (n-i-1) == j) {
 						newSquare.square[i][j] = (i*n)+j+1;
 					}
@@ -118,26 +58,63 @@ public class MagicSquaresGenerator {
 					}
 				}
 			}
-			return newSquare;
 		}
+		//Singly even squares
 		else {
-			return null;
+			int p = n/2;
+			MagicSquare[] squares = new MagicSquare[4];
+			squares[0] = generateSquare(p);
+			for(int i=1;i<4;i++) {
+				squares[i] = squares[0].copy();
+				squares[i].addToSquare((int)(i*Math.exp(p)));
+			}
+			for(int i=0;i<n;i++) {
+				for(int j=0;j<n;j++) { 
+					if(i < p && j < p) {
+						newSquare.square[i][j] = squares[0].square[i%p][j%p];
+					}
+					else if(i >= p && j < p) {
+						newSquare.square[i][j] = squares[3].square[i%p][j%p];
+					}
+					else if(i < p && j >= p) {
+						newSquare.square[i][j] = squares[2].square[i%p][j%p];
+					}
+					else {
+						newSquare.square[i][j] = squares[1].square[i%p][j%p];
+					}
+				}
+			}
+			if(n == 2) {
+				newSquare.shuffleSquare();
+				return newSquare;
+			}
+			int k = (n-2)/4;
+			int[] j2 = new int[2*k];
+			for(int i=0;i<=k;i++) {
+				j2[i] = i;
+			}
+			for(int i=(n-k+2);i<=n;i++) {
+				j2[i] = i;
+			}
+			for(int i=0;i<n;i++) {
+				for(int j=0;j<j2.length;j++) { 
+					int temp = newSquare.square[i][j2[j]];
+					newSquare.square[i][j2[j]] = newSquare.square[(i+p)%n][j2[j]];
+					newSquare.square[(i+p)%n][j2[j]] = temp;
+				}
+			}
+			int[] i2 = {k+1,k+1+p};
+			j2 = new int[]{1,k+1};
+			for(int i=0;i<i2.length;i++) {
+				for(int j=0;j<j2.length;j++) { 
+					int temp = newSquare.square[i2[i]][j2[j]];
+					newSquare.square[i2[i]][j2[j]] = newSquare.square[i2[(i+1)%2]][j2[j]];
+					newSquare.square[i2[(i+1)%2]][j2[j]] = temp;
+				}
+			}
 		}
+		//rotate and/or flip the square randomly
+		newSquare.shuffleSquare();
+		return newSquare;
 	}
-	private static int[] generateShuffledArray(int size) {
-		//Efficient way of generating random numbers
-		int[] seqArr = new int[size];
-		for(int i=0;i<size;i++) {
-			seqArr[i] = i;
-		}
-		Random rand = ThreadLocalRandom.current();
-		for(int i=size-1; i > 0; i--) {
-			int ind = rand.nextInt(i+1);
-			int a = seqArr[i];
-			seqArr[ind] = seqArr[i];
-			seqArr[i] = a;
-		}
-		return seqArr;
-	}
-	
 }
