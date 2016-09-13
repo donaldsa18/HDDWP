@@ -121,7 +121,7 @@ public class MagicSquaresGenerator {
 				newSquare.square[i2[1]][j2[j]] = temp;
 			}
 		}
-		System.out.println("The square is valid: "+newSquare.testSquare());
+		newSquare.shuffleSquare();
 		//rotate and/or flip the square randomly
 		return newSquare;
 	}
