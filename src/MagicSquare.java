@@ -1,3 +1,4 @@
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,14 +14,18 @@ import java.util.Set;
 public class MagicSquare {
 	public int n = 3;
 	public int[][] square;
+	public boolean[][] isVisible;
 	public static int INITNUM = -1;
 	public static int MAX_SIZE = 1000;
+	
 	public MagicSquare(int num) {
 		n = num;
 		square = new int[n][n];
+		isVisible = new boolean[n][n];
 		for(int i = 0; i < n; i++) {
 			for(int j = 0; j < n; j++) {
 				square[i][j] = INITNUM;
+				isVisible[i][j] = true;
 			}
 		}
 	}
@@ -128,7 +133,8 @@ public class MagicSquare {
 		return true;
 	}
 	
-	public String toPuzzle(int dif){
+	public /*String*/ void toPuzzle(int dif){
+		/*
         String result = "";
         double delChance = (double)this.n * (double)dif / 9.0; //or 10 maybe?
         
@@ -144,5 +150,83 @@ public class MagicSquare {
         }
         
        return result;
+	   */
+	   boolean hasDel = false;
+	   double delChance = (double) n * (double)dif / 9.0; //or 10 maybe?
+        while(!hasDel) {
+			for(int i = 0; i < n; i++) {
+				for(int j = 0; j < n; j++) {
+					if(Math.random() * n > delChance) {
+						this.isVisible[i][j] = true;
+					} else {
+						this.isVisible[i][j] = false;
+						hasDel = true;
+					}
+				}
+			}
+		}
+	   
+	   
     }
+	
+	public String puzzleString() {
+		String rtn = "";
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(this.isVisible[i][j]){
+					rtn += square[i][j]+"\t";
+				} else {
+					rtn += "\t";
+				}
+			}
+			rtn += "\n";
+		}
+		return rtn;
+	}
+	
+	public boolean isSolved() {
+		int visibleCount = 0;
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(this.isVisible[i][j]) visibleCount++;
+			}
+			
+		}
+		if(visibleCount == n * n) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void hint() {
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(!this.isVisible[i][j]){
+					this.isVisible[i][j] = true;
+					return;
+				}
+			}
+			
+		}
+	}
+	
+	public void saveCSV() {
+		try( PrintWriter csv = new PrintWriter("puzzle.csv") )
+        {
+			for(int i = 0; i < n; i++) {
+				for(int j = 0; j < n; j++) {
+					if(isVisible[i][j]) {
+						csv.print(square[i][j]);
+					} else {
+						csv.print('0');
+					}
+					if(j!=n-1) csv.print(',');
+				}
+				if(i!=n-1) csv.print('\n');
+			}
+        } catch ( Exception e ) {
+            System.out.println("Something happened.");
+        }
+	}
 }
