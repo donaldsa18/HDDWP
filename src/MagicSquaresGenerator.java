@@ -29,15 +29,33 @@ public class MagicSquaresGenerator {
 		while(n < 1 || n == 2 || n > MagicSquare.MAX_SIZE && square == null) {
 			System.out.println("Enter the size of the magic square: ");
 			n = scan.nextInt();
+			scan.nextLine();
 			square = generateSquare(n);
 		}
 		while(d < 1 || d > 5) {
 			System.out.println("Enter a difficulty (1-5): ");
 			d = scan.nextInt();
+			scan.nextLine();
+			square.toPuzzle(d);
 		}
-		scan.close();
+		
 		System.out.println(square);
-		System.out.println(square.toPuzzle(d));
+		System.out.println(square.puzzleString());
+		square.saveCSV();
+		System.out.println("Saved .csv");
+		/*while(!square.isSolved()) {
+			System.out.println("Press enter for a hint.");
+			//"(h)int or (s)ave as .csv and exit?"
+			String k = scan.nextLine();
+			//String k = scan.nextChar();
+			//switch to select, another while loop if unterminated
+			square.hint();
+			System.out.println(square.puzzleString());
+		}*/
+		//System.out.println(square.toPuzzle(d));
+		scan.close();
+		
+		//System.out.println("Solved.");
 	}
 	
 	private static MagicSquare generateSquare(int n) {
