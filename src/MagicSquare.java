@@ -34,6 +34,7 @@ public class MagicSquare {
 		for(int i = 0; i < n; i++) {
 			for(int j = 0; j < n; j++) {
 				newSq.square[i][j] = square[i][j];
+				newSq.isVisible[i][j] = isVisible[i][j];
 			}
 		}
 		return newSq;
@@ -111,7 +112,7 @@ public class MagicSquare {
 			}
 		}
 		magicConst = sum/n;
-		System.out.println("cols: "+Arrays.toString(sumCol)+"\nrows: "+Arrays.toString(sumRow)+"\ndiag: "+Arrays.toString(sumDiag));
+		//System.out.println("cols: "+Arrays.toString(sumCol)+"\nrows: "+Arrays.toString(sumRow)+"\ndiag: "+Arrays.toString(sumDiag));
 		for(int i=0;i<n;i++) {
 			if(magicConst != sumCol[i]) {
 				System.out.println("not equal to "+magicConst+" @ "+i+", check col, "+Arrays.toString(sumCol));
@@ -148,9 +149,17 @@ public class MagicSquare {
 				}
 			}
 		}
-	   
-	   
     }
+	
+	public void removeInvisible() {
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(!this.isVisible[i][j]) {
+					 this.square[i][j] = INITNUM;
+				}
+			}
+		}
+	}
 	
 	public String puzzleString() {
 		String rtn = "";
@@ -190,13 +199,24 @@ public class MagicSquare {
 					return;
 				}
 			}
-			
 		}
 	}
 	
+	public boolean equals(MagicSquare sq) {
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(square[i][j] != sq.square[i][j]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 	public void saveCSV() {
-		try( PrintWriter csv = new PrintWriter("puzzle.csv") )
+		try
         {
+			PrintWriter csv = new PrintWriter("puzzle.csv");
 			for(int i = 0; i < n; i++) {
 				for(int j = 0; j < n; j++) {
 					if(isVisible[i][j]) {
@@ -208,8 +228,15 @@ public class MagicSquare {
 				}
 				if(i!=n-1) csv.print('\n');
 			}
+			csv.close();
         } catch ( Exception e ) {
             System.out.println("Something happened.");
         }
 	}
+	/*public MagicSquareState toMagicSquareState() {
+		MagicSquareState newState = new MagicSquareState(n);
+		newState.square = square;
+		newState.testSquare();
+		return newState;
+	}*/
 }

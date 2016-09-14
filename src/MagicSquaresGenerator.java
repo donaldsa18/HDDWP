@@ -5,7 +5,7 @@
 import java.util.Scanner;
 
 public class MagicSquaresGenerator {
-	public static void main(String[] args) {
+	public void main(String[] args) {
 		int n = 0;
 		int d = 0;
 		MagicSquare square = null;
@@ -58,7 +58,7 @@ public class MagicSquaresGenerator {
 		//System.out.println("Solved.");
 	}
 	
-	private static MagicSquare generateSquare(int n) {
+	public static MagicSquare generateSquare(int n) {
 		if(n <= 0 || n > MagicSquare.MAX_SIZE || n == 2) {
 			return null;
 		}

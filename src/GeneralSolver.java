@@ -1,108 +1,245 @@
 import java.io.*;
 import java.util.Scanner;
 import java.lang.Integer;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
 
 public class GeneralSolver {
 	
-	static MagicSquare sq;
-	static int mConst; //magic constant
+	//static MagicSquare sq;
+	//static int mConst; //magic constant
 	//static boolean[][][] possibleNums; //[i][j][which are possible]
-	static int[] sumRow;
-	static int[] sumCol;
-	static int[] sumDiag;
-	static boolean[] isUsed; //numbers used;
-	
-	/*
-	public GeneralSolver(MagicSquare magic) {
-		sq = magic;
-		int size = sq.n;
-		mConst = size * ((size * size) + 1 ) / 2;
-		
-		possibleNums = new boolean [size][size][size*size+1];
-		
-		
-		/*
-		isUsed = new boolean[size * size + 1];
-		for(boolean x : isUsed) x = false;
-		isUsed[0] = true;
-		for(int i = 0; i < size; i++) {
-			for(int j = 0; j < size; j++) {
-				if(sq.isVisible[i][j]){
-					isUsed[sq.square[i][j]] = true;
-				}
-			}
-		}
-		
-	}*/
-	
+	//static int[] sumRow;
+	//static int[] sumCol;
+	//static int[] sumDiag;
+	//static boolean[] isUsed; //numbers used;
+	//static int numEmpty;
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		//load csv
-		sq = loadCSV();
-		int size = sq.n;
-		mConst = size * ((size * size) + 1 ) / 2;
-		sumRow = new int[size]; //r
-		sumCol = new int[size]; //c
-		sumDiag = new int[2]; //d
-		checkZeros(); //can solve easiest versions
-		analyze(); //grabs values for sums and whether a number is used
+		MagicSquareState sq = loadCSV();
+		//int size = sq.n;
+		//mConst = size * ((size * size) + 1 ) / 2;
+		//sumRow = new int[size]; //r
+		//sumCol = new int[size]; //c
+		//sumDiag = new int[2]; //d
+		GeneralSolver solve = new GeneralSolver();
+		solve.checkZeros(sq); //can solve easiest versions
+		solve.analyze(sq); //grabs values for sums and whether a number is used
+		solve.checkPossibilities(sq);
 		
+		
+		
+		System.out.println(sq);
+		
+	}
+	void checkPossibilities(MagicSquareState sq) {
 		//the following looks for largest sum to start guessing
-		//unfinished
 		int highest = 0;
 		int index = 0;
-		char orientation;
-		for(int i = 0; i < sumRow.length; i++) {
-		    if(highest<sumRow[i]) {
-		    	highest = sumRow[i];
+		char orientation = 'a';
+		int size = sq.n;
+		GeneralSolver solve = new GeneralSolver();
+		for(int i = 0; i < sq.sumRow.length; i++) {
+		    if(highest<sq.sumRow[i]) {
+		    	highest = sq.sumRow[i];
 		    	index = i;
 		    	orientation = 'r';
 		    }
 		}
 		
-		for(int i = 0; i < sumCol.length; i++) {
-		    if(highest<sumCol[i]) {
-		    	highest = sumCol[i];
+		for(int i = 0; i < sq.sumCol.length; i++) {
+		    if(highest<sq.sumCol[i]) {
+		    	highest = sq.sumCol[i];
 		    	index = i;
 		    	orientation = 'c';
 		    }
 		}
 		
-		for(int i = 0; i < sumDiag.length; i++) {
-		    if(highest<sumDiag[i]) {
-		    	highest = sumDiag[i];
+		for(int i = 0; i < sq.sumDiag.length; i++) {
+		    if(highest<sq.sumDiag[i]) {
+		    	highest = sq.sumDiag[i];
 		    	index = i;
 		    	orientation = 'd';
 		    }
 		}
 		
-		System.out.println(sq);
+		if(orientation != 'a') {
+			int remainingSum = sq.mConst - highest;
+			int remainingNums = 0;
+			int[] set = new int[sq.numEmpty];
+			Set<List<Integer>> dict = new HashSet<List<Integer>>();
+			int j = 0;
+			for(int i=0; i<remainingSum; i++) {
+				if(!sq.dict.contains(i)) {
+					set[j++] = i;
+				}
+			}
+			if(orientation == 'r') {
+				for(int i=0; i<size; i++) {
+					if(sq.square[index][i] == MagicSquare.INITNUM) {
+						remainingNums++;
+					}
+				}
+			}
+			else if(orientation == 'c') {
+				for(int i=0; i<size; i++) {
+					if(sq.square[i][index] == MagicSquare.INITNUM) {
+						remainingNums++;
+					}
+				}
+				
+			}
+			else if(orientation == 'd') {
+				if(index == 0) {
+					for(int i=0; i<size; i++) {
+						if(sq.square[i][i] == MagicSquare.INITNUM) {
+							remainingNums++;
+						}
+					}
+				}
+				else if(index == 1) {
+					for(int i=0; i<size; i++) {
+						if(sq.square[size-i-1][i] == MagicSquare.INITNUM) {
+							remainingNums++;
+						}
+					}
+				}
+			}
+			ArrayList<MagicSquare> squares = new ArrayList<MagicSquare>();
+			int[] tup = new int[remainingNums];
+			subsetSum(set, tup, remainingNums, 0, 0, 0, remainingSum, dict);
+			for(List<Integer> list: dict) {
+				ArrayList<ArrayList<Integer>> combinations = tryAllComb(list,list.size());
+				if(orientation == 'r') {
+					for(int i=0; i<combinations.size(); i++) {
+						int c=0;
+						MagicSquareState newSq = sq.copy();
+						for(int k=0; k<size; k++) {
+							if(newSq.square[index][k] == MagicSquare.INITNUM) {
+								newSq.square[index][k] = combinations.get(i).get(c++);
+							}
+						}
+						solve.analyze(newSq);
+						squares.add(newSq);
+					}
+				}
+				else if(orientation == 'c') {
+					for(int i=0; i<combinations.size(); i++) {
+						int c=0;
+						MagicSquareState newSq = sq.copy();
+						for(int k=0; k<size; k++) {
+							if(newSq.square[k][index] == MagicSquare.INITNUM) {
+								newSq.square[k][index] = combinations.get(i).get(c++);
+							}
+						}
+						solve.analyze(newSq);
+						squares.add(newSq);
+					}
+					
+				}
+				else if(orientation == 'd') {
+					for(int i=0; i<combinations.size(); i++) {
+						int c=0;
+						MagicSquareState newSq = sq.copy();
+						for(int k=0; k<size; k++) {
+							if(index == 0 && sq.square[k][k] == MagicSquare.INITNUM) {
+								newSq.square[k][k] = combinations.get(i).get(c++);
+							}
+							else if(index == 1 && sq.square[size-k-1][k] == MagicSquare.INITNUM) {
+								newSq.square[size-k-1][k] = combinations.get(i).get(c++);
+							}
+						}
+						solve.analyze(newSq);
+						squares.add(newSq);
+					}
+				}
+			}
+		}
 		
 	}
 	
-	public static void analyze() {
+	static ArrayList<ArrayList<Integer>> tryAllComb(List<Integer> nums, int length) {
+		ArrayList<ArrayList<Integer>> rtn = new ArrayList<ArrayList<Integer>>();
+		ArrayList<Integer> arr = new ArrayList<Integer>();
+		if(length == 1) {
+			arr.add(nums.get(0));
+			rtn.add(arr);
+		}
+		else {
+			ArrayList<ArrayList<Integer>> result = tryAllComb(nums, length-1);
+			for(int i=length-1; i>=0; i--) {
+				//add last number first and then the rest of the result
+				arr.add(nums.get(i));
+				arr.addAll(result.get(i));
+				rtn.add(arr);
+				
+				//add last number last and then the rest of the result first
+				arr = new ArrayList<Integer>();
+				arr.addAll(result.get(i));
+				arr.add(nums.get(i));
+				rtn.add(arr);
+			}
+		}
+		return rtn;
+	}
+	
+	static void subsetSum(int set[], int[] tup, int tupLength, int tupMaxSize, int sum, int ite, int target, Set<List<Integer>> dict) {
+		if(tupLength >= tupMaxSize) {
+			return;
+		}
+		if(target == sum) {
+			List<Integer> newTup = new ArrayList<Integer>();
+			for(int i=0; i<tupLength; i++) {
+				newTup.add(tup[i]);
+			}
+			dict.add(newTup);
+			if(ite+1 < set.length && sum-set[ite]+set[ite+1] <= target) {
+				subsetSum(set, tup, tupLength-1,tupMaxSize+1, sum-set[ite], ite+1, target, dict);
+			}
+			return;
+		}
+		else {
+			if(ite < set.length && sum-set[ite]+set[ite+1] <= target) {
+				for(int i=ite; i<set.length; i++) {
+					tup[tupLength] = set[i];
+					if(sum+set[i] <= target) {
+						subsetSum(set, tup, tupLength+1,tupMaxSize-1,sum+set[i], i+1, target, dict);
+					}
+				}
+			}
+		}
+	}
+	
+	public void analyze(MagicSquareState sq) {
 		//sum rows and cols
 		int size = sq.n;
+		sq.numEmpty = 0;
 		for(int i = 0; i < size; i++) {
 			for(int j = 0; j < size; j++) {
-				sumRow[i] += sq.square[i][j];
-				sumCol[i] += sq.square[j][i];
+				sq.sumRow[i] += sq.square[i][j];
+				sq.sumCol[i] += sq.square[j][i];
+				
+				//check if used
+				//sq.isUsed[sq.square[i][j]] = true;
+				
+				//keep count of empty 
+				if(sq.square[i][j] == MagicSquare.INITNUM) {
+					sq.numEmpty++;
+				}
 			}
 		}
 		//sum diag
 		for(int i = 0; i < size; i++) {
-			sumDiag[0] += sq.square[i][i];
-			sumDiag[1] += sq.square[i][size-1-i];
-		}
-		//check if used
-		for(int i = 0; i < size; i++) {
-			for(int j = 0; j < size; j++) {
-				isUsed[sq.square[i][j]] = true;
-			}
+			sq.sumDiag[0] += sq.square[i][i];
+			sq.sumDiag[1] += sq.square[i][size-1-i];
 		}
 	}
 	
-	public static void checkZeros() {
+	public void checkZeros(MagicSquareState sq) {
 		int size = sq.n;
 		int num0s = 0;
 		int sum = 0;
@@ -128,7 +265,7 @@ public class GeneralSolver {
 				}
 				//insert value if there is only one 0
 				if(num0s == 1) {
-					sq.square[loc[0]][loc[1]] = mConst - sum;
+					sq.square[loc[0]][loc[1]] = sq.mConst - sum;
 					
 					newInsert = true;
 				}
@@ -146,7 +283,7 @@ public class GeneralSolver {
 					sum += sq.square[j][i];
 				}
 				if(num0s == 1) {
-					sq.square[loc[0]][loc[1]] = mConst - sum;
+					sq.square[loc[0]][loc[1]] = sq.mConst - sum;
 					
 					newInsert = true;
 				}
@@ -163,7 +300,7 @@ public class GeneralSolver {
 				sum += sq.square[i][i];
 			}
 			if(num0s == 1) {
-				sq.square[loc[0]][loc[0]] = mConst - sum;
+				sq.square[loc[0]][loc[0]] = sq.mConst - sum;
 				newInsert = true;
 			}
 			num0s = 0;
@@ -176,13 +313,13 @@ public class GeneralSolver {
 				sum += sq.square[i][size-i-1];
 			}
 			if(num0s == 1) {
-				sq.square[loc[0]][size-loc[0]-1] = mConst - sum;
+				sq.square[loc[0]][size-loc[0]-1] = sq.mConst - sum;
 				newInsert = true;
 			}
 		}//if filled in any square, repeat
 	}
 	
-	public static MagicSquare loadCSV() throws FileNotFoundException {
+	public static MagicSquareState loadCSV() throws FileNotFoundException {
 		Scanner s = new Scanner(new File("puzzle.csv"));
 		String csv = "";
 		
@@ -191,7 +328,7 @@ public class GeneralSolver {
 		}
 		
 		String[] temp1 = csv.split("\n");
-		MagicSquare rtn = new MagicSquare(temp1.length);
+		MagicSquareState rtn = new MagicSquareState(temp1.length);
 		
 		/*
 		for(String str1 : temp1) {
@@ -214,18 +351,6 @@ public class GeneralSolver {
 		s.close();
 		
 		return rtn;
-	}
-	
-	public static void analyze1(){
-		
-		//possibleNums = new boolean [size][size][size*size+1]; // check this in analyze2
-		/*
-		for(int i = 0; i < size; i++) {
-			for(int j = 0; j < size; j++) {
-				//check 
-			}
-		}*/
-		
 	}
 	
 }
