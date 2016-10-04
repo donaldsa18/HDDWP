@@ -1,4 +1,5 @@
 #include "MagicSquareState.h"
+#include "RectangularArrays.h"
 
 MagicSquareState::MagicSquareState(int num) : MagicSquare(num)
 {
@@ -32,14 +33,6 @@ MagicSquareState *MagicSquareState::toMagicSquareState(MagicSquare *sq)
 MagicSquareState *MagicSquareState::copy()
 {
 	MagicSquareState *newSq = new MagicSquareState(n);
-	/*newSq.sumRow = Arrays.copyOf(sumRow,n);
-	newSq.sumCol = Arrays.copyOf(sumCol,n);
-	newSq.sumDiag = Arrays.copyOf(sumDiag,2);
-	newSq.countRow = Arrays.copyOf(countRow,n);
-	newSq.countCol = Arrays.copyOf(countCol,n);
-	newSq.countDiag = Arrays.copyOf(countDiag,2);
-	newSq.dict.addAll(dict);
-	newSq.numEmpty = numEmpty;*/
 	for (int i = 0;i < n;i++)
 	{
 		for (int j = 0;j < n;j++)
@@ -97,7 +90,7 @@ void MagicSquareState::shuffleSquare()
 //ORIGINAL LINE: int[][] newSq = new int[n][n];
 //JAVA TO C++ CONVERTER NOTE: The following call to the 'RectangularArrays' helper class reproduces the rectangular array initialization that is automatic in Java:
 	int **newSq = RectangularArrays::ReturnRectangularIntArray(n, n);
-	int rand = static_cast<int>(Math::random()*8);
+	int rand = std::rand() % 8;
 	for (int i = 0;i < n;i++)
 	{
 		for (int j = 0;j < n;j++)

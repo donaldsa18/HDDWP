@@ -1,4 +1,9 @@
 #include "MagicSquare.h"
+#include "RectangularArrays.h"
+#include <ctime>
+#include <map>
+#include <iostream>
+#include <fstream>
 
 int MagicSquare::INITNUM = 0;
 int MagicSquare::MAX_SIZE = 100;
@@ -52,11 +57,9 @@ std::string MagicSquare::toString()
 
 void MagicSquare::shuffleSquare()
 {
-//JAVA TO C++ CONVERTER WARNING: Java to C++ Converter has converted this array to a pointer. You will need to call 'delete[]' where appropriate:
-//ORIGINAL LINE: int[][] newSq = new int[n][n];
-//JAVA TO C++ CONVERTER NOTE: The following call to the 'RectangularArrays' helper class reproduces the rectangular array initialization that is automatic in Java:
 	int **newSq = RectangularArrays::ReturnRectangularIntArray(n, n);
-	int rand = static_cast<int>(Math::random()*8);
+	srand(std::time(NULL));
+	int rand = std::rand() % 8;
 	for (int i = 0;i < n;i++)
 	{
 		for (int j = 0;j < n;j++)
@@ -92,6 +95,7 @@ void MagicSquare::shuffleSquare()
 			}
 		}
 	}
+	delete[] square;
 	square = newSq;
 }
 
@@ -106,6 +110,8 @@ void MagicSquare::addToSquare(int add)
 	}
 }
 
+
+
 bool MagicSquare::testSquare()
 {
 //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter has converted this array to a pointer. You will need to call 'delete[]' where appropriate:
@@ -117,19 +123,20 @@ bool MagicSquare::testSquare()
 //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter has converted this array to a pointer. You will need to call 'delete[]' where appropriate:
 //ORIGINAL LINE: int[] sumDiag = new int[2];
 	int *sumDiag = new int[2] {};
+
 	int sum = 0;
 	int magicConst;
-	Set<int> *dict = std::unordered_set<int>();
+	int *dict = new int[n*n] {};
 	for (int i = 0;i < n;i++)
 	{
 		for (int j = 0;j < n;j++)
 		{
-			if (dict->contains(square[i][j]))
+			if (square[i][j] == dict[i*n+j])
 			{
 				std::cout << std::string("Contains two ") << square[i][j] << std::string("'s") << std::endl;
 				return false;
 			}
-			dict->add(square[i][j]);
+			dict[i*n + j] = square[i][j];
 			sum += square[i][j];
 			sumRow[i] += square[i][j];
 			sumCol[j] += square[i][j];
@@ -150,44 +157,60 @@ bool MagicSquare::testSquare()
 		if (magicConst != sumCol[i])
 		{
 //JAVA TO C++ CONVERTER TODO TASK: There is no native C++ equivalent to 'toString':
-			std::cout << std::string("not equal to ") << magicConst << std::string(" @ ") << i << std::string(", check col, ") << Arrays->toString(sumCol) << std::endl;
+			std::cout << std::string("not equal to ") << magicConst << std::string(" @ ") << i << std::string(", check col");
+			delete[] sumRow;
+			delete[] sumCol;
+			delete[] sumDiag;
 			return false;
 		}
 		if (magicConst != sumRow[i])
 		{
 //JAVA TO C++ CONVERTER TODO TASK: There is no native C++ equivalent to 'toString':
-			std::cout << std::string("not equal to ") << magicConst << std::string(" @ ") << i << std::string(", check row, ") << Arrays->toString(sumRow) << std::endl;
+			std::cout << std::string("not equal to ") << magicConst << std::string(" @ ") << i << std::string(", check row");
+			delete[] sumRow;
+			delete[] sumCol;
+			delete[] sumDiag;
 			return false;
 		}
 	}
 	if (sumCol[0] != sumDiag[0])
 	{
 		std::cout << std::string("check 1st diag, ") << sumDiag[0] << std::endl;
+		delete[] sumRow;
+		delete[] sumCol;
+		delete[] sumDiag;
 		return false;
 	}
 	if (sumCol[0] != sumDiag[1])
 	{
 		std::cout << std::string("check 2nd diag, ") << sumDiag[1] << std::endl;
+		delete[] sumRow;
+		delete[] sumCol;
+		delete[] sumDiag;
 		return false;
 	}
+	delete[] sumRow;
+	delete[] sumCol;
+	delete[] sumDiag;
 	return true;
 }
 
 void MagicSquare::toPuzzle(int dif)
 {
+	srand(std::time(NULL));
 	switch (0)
 	{
 	case 1:
 		for (int i = 0; i < n / 2; i++)
 		{
-			int randJ = static_cast<int>(Math::random() * n);
-			int randI = static_cast<int>(Math::random() * n);
+			int randJ = std::rand() % n;
+			int randI = std::rand() % n;
 			this->isVisible[randI][randJ] = false;
 		}
 	case 0:
 		for (int i = 0; i < n; i++)
 		{
-			int randJ = static_cast<int>(Math::random() * n);
+			int randJ = std::rand() % n;
 			this->isVisible[i][randJ] = false;
 		}
 		//iterate through columns
@@ -203,39 +226,11 @@ void MagicSquare::toPuzzle(int dif)
 			//column done
 			if (isFull)
 			{
-				int randJ = static_cast<int>(Math::random() * n);
+				int randJ = std::rand() % n;
 				this->isVisible[randJ][i] = false;
 			}
 		}
 	}
-		/*break;
-	}
-		
-
-	/*
-	boolean hasDel = false;
-	double delChance = (double) n * (double)dif / 9.0; //or 10 maybe?
-	while(!hasDel) {
-		for(int i = 0; i < n; i++) {
-			int randJ = (int) (Math.random() * n);
-			if(Math.random() * n > delChance) {
-				this.isVisible[i][randJ] = true;
-			} else {
-				this.isVisible[i][randJ] = false;
-				hasDel = true;
-			}
-		}
-		for(int i = 0; i < n; i++) {
-			for(int j = 0; j < n; j++) {
-				if(Math.random() * n > delChance) {
-					this.isVisible[i][j] = true;
-				} else {
-					this.isVisible[i][j] = false;
-					hasDel = true;
-				}
-			}
-		}
-	}*/
 }
 
 std::string MagicSquare::puzzleString()
@@ -321,30 +316,31 @@ void MagicSquare::saveCSV()
 {
 	try
 	{
-		PrintWriter *csv = new PrintWriter("puzzle.csv");
+		std::ofstream csv;
+		csv.open("puzzle.csv");
 		for (int i = 0; i < n; i++)
 		{
 			for (int j = 0; j < n; j++)
 			{
 				if (isVisible[i][j])
 				{
-					csv->print(square[i][j]);
+					csv << square[i][j]+"";
 				}
 				else
 				{
-					csv->print('0');
+					csv << '0';
 				}
 				if (j != n - 1)
 				{
-					csv->print(',');
+					csv << ',';
 				}
 			}
 			if (i != n - 1)
 			{
-				csv->print('\n');
+				csv << '\n';
 			}
 		}
-		csv->close();
+		csv.close();
 	}
 	catch (std::exception &e)
 	{

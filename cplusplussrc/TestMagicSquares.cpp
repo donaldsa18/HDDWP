@@ -5,7 +5,7 @@
 
 void TestMagicSquares::main(std::string args[])
 {
-	MagicSquareState *square = MagicSquareState::toMagicSquareState(MagicSquaresGenerator::generateSquare(1));
+	MagicSquareState *square = MagicSquareState::toMagicSquareState(MagicSquaresGenerator::generateSquare(10));
 	std::cout << std::string("The original square:") << std::endl;
 	std::cout << square << std::endl;
 	square->toPuzzle(1);

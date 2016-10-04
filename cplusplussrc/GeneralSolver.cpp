@@ -2,9 +2,8 @@
 #include "MagicSquareState.h"
 #include "MagicSquare.h"
 
-using boost::optional<int>;
 
-void GeneralSolver::main(std::string args[]) throw(FileNotFoundException)
+void GeneralSolver::main(std::string args[]) throw(std::exception)
 {
 	//load csv
 	MagicSquareState *sq = loadCSV();
