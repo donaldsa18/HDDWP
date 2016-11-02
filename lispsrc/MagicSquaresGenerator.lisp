@@ -44,17 +44,20 @@
 	)
 )
 
+;Converts nested lists into a 2D array
 ;http://stackoverflow.com/questions/9549568/common-lisp-convert-between-lists-and-arrays
 (defun list-to-2d-array (list)
   (make-array (list (length list)
                     (length (first list)))
               :initial-contents list))
 
+;Converts a 2D array into nested lists
 (defun 2d-array-to-list (array)
   (loop for i below (array-dimension array 0)
         collect (loop for j below (array-dimension array 1)
                       collect (aref array i j))))
 
+;Generates a magic square when it's size is not divisible by 4, but still even
 (defun generateSinglyEven(n)
 	(setf half (floor (/ n 2)))
 	(setf sq (generateOdd half))
@@ -106,8 +109,11 @@
 	(return-from generateSinglyEven (2d-array-to-list newsqarr))
 )
 
+;Generates a magic square of any size using algorithms based
+;off of its divisibility. A hard constraint is set to limit
+;the size to between 2 and 100 to ensure good runtime performance.
 (defun generate(n)
-	(if (or (> n 2) (< n 100))
+	(if (and (> n 2) (< n 100))
 		(if (= (mod n 2) 1)
 			(generateOdd n)
 			(if (= (mod n 4) 0)
